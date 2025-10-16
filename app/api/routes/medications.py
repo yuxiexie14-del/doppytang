@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ... import schemas
@@ -53,7 +54,12 @@ def update_medication(
     return medication
 
 
-@router.delete("/{medication_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{medication_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 def delete_medication(medication_id: int, db: Session = Depends(get_db_session)) -> None:
     medication = _get_medication_or_404(db, medication_id)
     db.delete(medication)
