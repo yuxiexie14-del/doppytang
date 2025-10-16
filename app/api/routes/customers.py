@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ... import schemas
@@ -54,7 +55,12 @@ def update_customer(
     return customer
 
 
-@router.delete("/{customer_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{customer_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 def delete_customer(customer_id: int, db: Session = Depends(get_db_session)) -> None:
     customer = _get_customer_or_404(db, customer_id)
     db.delete(customer)

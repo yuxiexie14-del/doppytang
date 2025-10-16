@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ... import schemas
@@ -53,7 +54,12 @@ def update_feeding(
     return feeding
 
 
-@router.delete("/{feeding_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{feeding_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 def delete_feeding(feeding_id: int, db: Session = Depends(get_db_session)) -> None:
     feeding = _get_feeding_or_404(db, feeding_id)
     db.delete(feeding)
