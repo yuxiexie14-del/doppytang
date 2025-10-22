@@ -1,0 +1,3 @@
+services:
+  db:
+    ports: []    # 禁止把 3306 映射到宿主机，避免与 Windows 上的 MySQL 冲突

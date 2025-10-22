@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   db:
     image: mysql:8.0
@@ -8,22 +7,25 @@ services:
       MYSQL_USER: ${MYSQL_USER:-app}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-app}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
-    command: ["--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-    ports:
-      - "3306:3306"
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     volumes:
       - mysql_data:/var/lib/mysql
+    # 不对外暴露 3306；容器内部互联用服务名 db
 
   api:
     build: .
     depends_on:
       - db
     environment:
-      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-app}@db:3306/${MYSQL_DATABASE:-doppytang}}
+      # 给一个可用的默认连接串；需要时可在 .env 里覆盖 DATABASE_URL
+      DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://app:app@db:3306/doppytang}
       CORS_ORIGINS: ${CORS_ORIGINS:-*}
       JWT_SECRET: ${JWT_SECRET:-change-me}
     ports:
-      - "8000:8000"
+      - "${APP_PORT:-8080}:8000"
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
     restart: unless-stopped
 
