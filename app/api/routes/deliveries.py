@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ... import schemas
@@ -87,7 +88,12 @@ def update_delivery(
     return delivery
 
 
-@router.delete("/{delivery_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{delivery_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 def delete_delivery(delivery_id: int, db: Session = Depends(get_db_session)) -> None:
     delivery = _get_delivery_or_404(db, delivery_id)
     contract = _ensure_contract(db, delivery.contract_id)

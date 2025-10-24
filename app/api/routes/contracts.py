@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ... import schemas
@@ -59,7 +60,12 @@ def update_contract(
     return contract
 
 
-@router.delete("/{contract_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{contract_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 def delete_contract(contract_id: int, db: Session = Depends(get_db_session)) -> None:
     contract = _get_contract_or_404(db, contract_id)
     db.delete(contract)

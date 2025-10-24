@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ... import schemas
@@ -53,7 +54,12 @@ def update_weighing(
     return weighing
 
 
-@router.delete("/{weighing_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{weighing_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 def delete_weighing(weighing_id: int, db: Session = Depends(get_db_session)) -> None:
     weighing = _get_weighing_or_404(db, weighing_id)
     db.delete(weighing)

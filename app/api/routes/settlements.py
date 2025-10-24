@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -37,7 +38,7 @@ def trial_settlement(payload: schemas.SettlementTrialRequest, db: Session = Depe
     eggs_query = db.query(func.coalesce(func.sum(Delivery.eggs_delivered), 0)).filter(
         Delivery.contract_id == contract.id
     )
-    eggs_total = eggs_query.scalar_one()
+    eggs_total = eggs_query.scalar()
     eggs_delivered = payload.eggs_delivered if payload.eggs_delivered is not None else eggs_total
     price = float(payload.price_override if payload.price_override is not None else contract.price)
     amount_due = float(price) * float(eggs_delivered) / max(float(contract.total_eggs), 1)
@@ -80,7 +81,12 @@ def update_settlement(
     return settlement
 
 
-@router.delete("/{settlement_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{settlement_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 def delete_settlement(settlement_id: int, db: Session = Depends(get_db_session)) -> None:
     settlement = _get_settlement_or_404(db, settlement_id)
     db.delete(settlement)

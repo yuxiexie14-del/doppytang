@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from ... import schemas
@@ -51,7 +52,12 @@ def update_batch(batch_id: int, payload: schemas.BatchUpdate, db: Session = Depe
     return batch
 
 
-@router.delete("/{batch_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{batch_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
+)
 def delete_batch(batch_id: int, db: Session = Depends(get_db_session)) -> None:
     batch = _get_batch_or_404(db, batch_id)
     db.delete(batch)
